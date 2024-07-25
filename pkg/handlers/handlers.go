@@ -4,9 +4,9 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/AMSteffensen/goapp/pkg/config"
-	"github.com/AMSteffensen/goapp/pkg/models"
-	"github.com/AMSteffensen/goapp/pkg/render"
+	"github.com/AMSteffensen/bookings/pkg/config"
+	"github.com/AMSteffensen/bookings/pkg/models"
+	"github.com/AMSteffensen/bookings/pkg/render"
 )
 
 var Repo *Repository

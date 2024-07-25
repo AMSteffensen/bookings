@@ -1,4 +1,4 @@
-module github.com/AMSteffensen/goapp
+module github.com/AMSteffensen/bookings
 
 go 1.22.5
 
