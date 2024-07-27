@@ -1,4 +1,4 @@
-# Go Web Application
+# Bookings and reservations
 
 This is a simple web application written in Go.
 
@@ -20,8 +20,8 @@ This is a simple web application written in Go.
 1. Clone the repository:
 
     ```sh
-    git clone https://github.com/amsteffensen/goapp.git
-    cd goapp
+    git clone https://github.com/amsteffensen/bookings.git
+    cd bookings
     ```
 
 2. Install the dependencies:
