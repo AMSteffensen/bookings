@@ -13,24 +13,13 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/css/datepicker-bs5.min.css"
     />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://unpkg.com/notie/dist/notie.min.css"
+    />
+    <link rel="stylesheet" type="text/css" href="../static/css/styles.css" />
     <title>Document</title>
-
-    <style>
-      .footer {
-        background-color: #333;
-        margin-top: 1.5rem;
-        height: 5rem;
-        padding: 2rem;
-      }
-      p {
-        color: #fff;
-        font-size: 80%;
-      }
-
-      .redText {
-        color: red;
-      }
-    </style>
   </head>
   <body>
     <nav
@@ -158,12 +147,16 @@
         </div>
       </div>
     </footer>
+
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
     <script src="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/js/datepicker-full.min.js"></script>
+
+    <script src="https://unpkg.com/notie"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
       const redDays = [
@@ -184,14 +177,55 @@
         datesDisabled: redDays,
         daysOfWeekDisabled: [0, 6],
         weekStart: 1,
+        daysOfWeekHighlighted: [1, 2, 3, 4, 5],
       });
 
       (() => {
         "use strict";
 
+        let attention = prompt();
+
         // Fetch all the forms we want to apply custom Bootstrap validation styles to
         const forms = document.querySelectorAll(".needs-validation");
 
+        let html = `
+          <form
+        id="check-avaiability-form"
+        action=""
+        method="post"
+        novailidate
+        class="needs-validation"
+      >
+        <div class="form-row">
+          <div class="col">
+            <div class="form-row" id="reservation-dates-modal">
+              <div class="col">
+                <input
+                  disabled
+                  required
+                  class="form-control"
+                  type="text"
+                  name="start"
+                  id="start"
+                  placeholder="Arrival"
+                />
+              </div>
+              <div class="col">
+                <input
+                  disabled
+                  required
+                  class="form-control"
+                  type="text"
+                  name="end"
+                  id="end"
+                  placeholder="Departure"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+            `;
         // Loop over them and prevent submission
         Array.from(forms).forEach((form) => {
           form.addEventListener(
@@ -200,6 +234,17 @@
               if (!form.checkValidity()) {
                 event.preventDefault();
                 event.stopPropagation();
+                attention.custom({
+                  msg: html,
+                  icon: "error",
+                  title: "Choose your dates",
+                });
+              } else {
+                event.preventDefault();
+                attention.success({ msg: "Success!", icon: "success" });
+                setTimeout(() => {
+                  form.submit();
+                }, 2000);
               }
 
               form.classList.add("was-validated");
@@ -209,16 +254,101 @@
         });
       })();
 
-      document
-        .getElementById("searchBtn")
-        .addEventListener("click", function () {
-          let myEl = document.getElementById("reservation-text");
-          if (myEl.classList.contains("redText")) {
-            myEl.classList.remove("redText");
-          } else {
-            myEl.classList.add("redText");
-          }
+      function notify(msg, msgType) {
+        // 'success', 'warning', 'error', 'info', 'neutral']
+        notie.alert({
+          type: msgType,
+          text: msg,
         });
+      }
+
+      function notifyModal(title, text, msgType, textButton) {
+        //'success', 'warning', 'error', 'info',
+        swal({
+          title: title,
+          text: text,
+          icon: msgType,
+          button: textButton,
+        });
+      }
+
+      function prompt() {
+        let toast = function (c) {
+          const { msg = "", icon = "success", position = "top-end" } = c;
+          const Toast = Swal.mixin({
+            toast: true,
+            title: msg,
+            position: position,
+            icon: icon,
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.onmouseenter = Swal.stopTimer;
+              toast.onmouseleave = Swal.resumeTimer;
+            },
+          });
+          Toast.fire({});
+        };
+
+        let success = function (c) {
+          const { msg = "", title = "", footer = "" } = c;
+          Swal.fire({
+            icon: "success",
+            title: title,
+            text: msg,
+            footer: footer,
+          });
+        };
+
+        let error = function (c) {
+          const { msg = "", title = "", footer = "" } = c;
+          Swal.fire({
+            icon: "error",
+            title: title,
+            text: msg,
+            footer: footer,
+          });
+        };
+
+        async function custom(c) {
+          const { msg = "", title = "" } = c;
+
+          const { value: formValues } = await Swal.fire({
+            title: title,
+            html: msg,
+            backdrop: false,
+            focusConfirm: false,
+            showCancelButton: true,
+            willOpen: () => {
+              const elem = document.getElementById("reservation-dates-modal");
+              const rp = new DateRangePicker(elem, {
+                format: "dd.mm.yyyy",
+              });
+            },
+            preConfirm: () => {
+              return [
+                document.getElementById("start").value,
+                document.getElementById("end").value,
+              ];
+            },
+            didOpen: () => {
+              document.getElementById("start").removeAttribute("disabled");
+              document.getElementById("end").removeAttribute("disabled");
+            },
+          });
+          if (formValues) {
+            Swal.fire(JSON.stringify(formValues));
+          }
+        }
+
+        return {
+          toast: toast,
+          success: success,
+          error: error,
+          custom: custom,
+        };
+      }
     </script>
   </body>
 </html>
