@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"text/template"
-
+	"html/template"
 	"github.com/AMSteffensen/bookings/pkg/config"
 	"github.com/AMSteffensen/bookings/pkg/models"
 )
