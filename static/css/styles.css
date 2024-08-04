@@ -4,11 +4,7 @@
     height: 5rem;
     padding: 2rem;
   }
-  p {
-    color: #fff;
-    font-size: 80%;
-  }
-
+  
   .notie-container {
     box-shadow: none;
   }
@@ -25,6 +21,8 @@
     margin-top: 1.5rem;
     height: 5rem;
     padding: 2rem;
+
+    color: #fff;
   }
 
   .room-img {

@@ -88,57 +88,7 @@
         
         {{end}}
 
-    <div class="container">
-      <div class="row">
-        <form
-          action="booking.html"
-          method="GET"
-          class="row g-3 needs-validation"
-          novalidate
-        >
-          <div class="row" id="reservation-dates">
-            <div class="col-md-6">
-              <label for="startDate" class="form-label">Starting Date</label>
-              <input
-                id="startDate"
-                name="startDate"
-                required
-                class="form-control"
-                type="text"
-                name="start"
-              />
-              <div class="invalid-feedback">
-                Please provide a starting date.
-              </div>
-            </div>
-            <div class="col-md-6">
-              <label for="endDate" class="form-label">End Date</label>
-              <input
-                id="endDate"
-                name="endDate"
-                required
-                class="form-control"
-                type="text"
-                name="end"
-              />
-              <div class="invalid-feedback">Please provide an end date.</div>
-            </div>
-          </div>
-
-          <div class="col-12">
-            <button id="searchBtn" type="submit" class="btn btn-primary mb-3">
-              Search
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <div class="row">
-        <div class="col">
-          <p id="reservation-text">Hello</p>
-        </div>
-      </div>
-    </div>
+  
 
     <footer class="footer">
       <div class="row">
@@ -172,124 +122,53 @@
 
     <script>
 
-    
-      const redDays = [
-        "01.01.2024",
-        "29.03.2024",
-        "01.04.2024",
-        "01.05.2024",
-        "17.05.2024",
-        "09.05.2024",
-        "19.05.2024",
-        "25.12.2024",
-        "26.12.2024",
-      ];
+      let attention = Prompt();
 
-      const elem = document.getElementById("reservation-dates");
-      const rangepicker = new DateRangePicker(elem, {
-        format: "dd.mm.yyyy",
-        datesDisabled: redDays,
-        daysOfWeekDisabled: [0, 6],
-        weekStart: 1,
-        daysOfWeekHighlighted: [1, 2, 3, 4, 5],
-      });
-
-      (() => {
-        "use strict";
-
-        let attention = prompt();
-
+(function () {
+    'use strict';
+    window.addEventListener('load', function () {
         // Fetch all the forms we want to apply custom Bootstrap validation styles to
-        const forms = document.querySelectorAll(".needs-validation");
-
-        let html = `
-          <form
-        id="check-avaiability-form"
-        action=""
-        method="post"
-        novailidate
-        class="needs-validation"
-      >
-        <div class="form-row">
-          <div class="col">
-            <div class="form-row" id="reservation-dates-modal">
-              <div class="col">
-                <input
-                  disabled
-                  required
-                  class="form-control"
-                  type="text"
-                  name="start"
-                  id="start"
-                  placeholder="Arrival"
-                />
-              </div>
-              <div class="col">
-                <input
-                  disabled
-                  required
-                  class="form-control"
-                  type="text"
-                  name="end"
-                  id="end"
-                  placeholder="Departure"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </form>
-            `;
+        let forms = document.getElementsByClassName('needs-validation');
         // Loop over them and prevent submission
-        Array.from(forms).forEach((form) => {
-          form.addEventListener(
-            "submit",
-            (event) => {
-              if (!form.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-                attention.custom({
-                  msg: html,
-                  icon: "error",
-                  title: "Choose your dates",
-                });
-              } else {
-                event.preventDefault();
-                attention.success({ msg: "Success!", icon: "success" });
-                setTimeout(() => {
-                  form.submit();
-                }, 2000);
-              }
-
-              form.classList.add("was-validated");
-            },
-            false
-          );
+        Array.prototype.filter.call(forms, function (form) {
+            form.addEventListener('submit', function (event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
         });
-      })();
+    }, false);
+})();
 
-      function notify(msg, msgType) {
-        // 'success', 'warning', 'error', 'info', 'neutral']
-        notie.alert({
-          type: msgType,
-          text: msg,
-        });
-      }
 
-      function notifyModal(title, text, msgType, textButton) {
-        //'success', 'warning', 'error', 'info',
-        swal({
-          title: title,
-          text: text,
-          icon: msgType,
-          button: textButton,
-        });
-      }
+function notify(msg, msgType) {
+    notie.alert({
+        type: msgType,
+        text: msg,
+    })
+}
 
-      function prompt() {
-        let toast = function (c) {
-          const { msg = "", icon = "success", position = "top-end" } = c;
-          const Toast = Swal.mixin({
+function notifyModal(title, text, icon, confirmationButtonText) {
+    Swal.fire({
+        title: title,
+        html: text,
+        icon: icon,
+        confirmButtonText: confirmationButtonText
+    })
+}
+
+function Prompt() {
+    let toast = function (c) {
+        const{
+            msg = '',
+            icon = 'success',
+            position = 'top-end',
+
+        } = c;
+
+        const Toast = Swal.mixin({
             toast: true,
             title: msg,
             position: position,
@@ -298,72 +177,101 @@
             timer: 3000,
             timerProgressBar: true,
             didOpen: (toast) => {
-              toast.onmouseenter = Swal.stopTimer;
-              toast.onmouseleave = Swal.resumeTimer;
-            },
-          });
-          Toast.fire({});
-        };
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        })
 
-        let success = function (c) {
-          const { msg = "", title = "", footer = "" } = c;
-          Swal.fire({
-            icon: "success",
+        Toast.fire({})
+    }
+
+    let success = function (c) {
+        const {
+            msg = "",
+            title = "",
+            footer = "",
+        } = c
+
+        Swal.fire({
+            icon: 'success',
             title: title,
             text: msg,
             footer: footer,
-          });
-        };
+        })
 
-        let error = function (c) {
-          const { msg = "", title = "", footer = "" } = c;
-          Swal.fire({
-            icon: "error",
+    }
+
+    let error = function (c) {
+        const {
+            msg = "",
+            title = "",
+            footer = "",
+        } = c
+
+        Swal.fire({
+            icon: 'error',
             title: title,
             text: msg,
             footer: footer,
-          });
-        };
+        })
 
-        async function custom(c) {
-          const { msg = "", title = "" } = c;
+    }
 
-          const { value: formValues } = await Swal.fire({
+    async function custom(c) {
+        const {
+            msg = "",
+            title = "",
+        } = c;
+
+        const { value: result } = await Swal.fire({
             title: title,
             html: msg,
             backdrop: false,
             focusConfirm: false,
             showCancelButton: true,
             willOpen: () => {
-              const elem = document.getElementById("reservation-dates-modal");
-              const rp = new DateRangePicker(elem, {
-                format: "dd.mm.yyyy",
-              });
-            },
-            preConfirm: () => {
-              return [
-                document.getElementById("start").value,
-                document.getElementById("end").value,
-              ];
+                if (c.willOpen !== undefined) {
+                  c.willOpen();
+                }
             },
             didOpen: () => {
-              document.getElementById("start").removeAttribute("disabled");
-              document.getElementById("end").removeAttribute("disabled");
+               if (c.didOpen !== undefined) {
+                c.didOpen();
+               }
             },
-          });
-          if (formValues) {
-            Swal.fire(JSON.stringify(formValues));
+            preConfirm: () => {
+                return [
+                    document.getElementById('start').value,
+                    document.getElementById('end').value
+                ]
+            }
+        })
+
+        if (result) {
+          if (result.dismiss !== swal.DismissReason.cancel) {
+            if (result.value !== "") {
+              if (c.callback !== undefined) {
+                c.callback(result);
+              }
+            } else {
+              c.callback(false)
+            }
+          } else {
+            c.callback(false)
           }
         }
 
-        return {
-          toast: toast,
-          success: success,
-          error: error,
-          custom: custom,
-        };
-      }
-    </script>
+       
+    }
+
+    return {
+        toast: toast,
+        success: success,
+        error: error,
+        custom: custom,
+    }
+}
+</script>
   </body>
 </html>
 {{end}}
